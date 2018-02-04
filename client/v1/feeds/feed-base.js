@@ -38,6 +38,14 @@ FeedBase.prototype.all = function (parameters) {
                 throw new Exceptions.RequestsLimitError;
             return Promise.resolve([]).delay(parameters.pause * that.parseErrorsMultiplier)
         })
+        .catch(Exceptions.RequestError, function () {
+        	// Every consecutive ParseError makes delay befor new request longer. Otherwise we will never reach the end.
+        	that.parseErrorsMultiplier++;
+        	// When delay time is beyond reasonable, throw exception.
+        	if (that.parseErrorsMultiplier > parameters.maxErrors)
+        		throw new Exceptions.RequestsLimitError;
+        	return Promise.resolve([]).delay(parameters.pause * that.parseErrorsMultiplier)
+        })
         .then(function (response) {
             var results = response.map(that.map);
             if(_.isFunction(that.reduce))
