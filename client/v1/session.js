@@ -159,9 +159,10 @@ Session.login = function(session, username, password) {
         .spread(function (session) {
             return [session, new Timeline(session).get()];
         })
-        .spread(function (session) {
-            return [session, Thread.recentRecipients(session)];
-        })
+        // https://github.com/dilame/instagram-private-api/issues/742
+        // .spread(function (session) {
+        //     return [session, Thread.recentRecipients(session)];
+        // })
         .spread(function (session) {
             return [session, new Inbox(session).get()];
         })
